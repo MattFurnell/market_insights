@@ -1,1 +1,48 @@
+{
+  "sources": [
+    { "name": "Insurance Business UK", "feedUrl": "https://www.insurancebusinessmag.com/uk/rss", "defaultCategory": "Trade" },
+    { "name": "BIBA", "siteUrl": "https://www.biba.org.uk/news-publication/", "defaultCategory": "Trade" },
 
+    { "name": "FCA - News (RSS)", "feedUrl": "https://www.fca.org.uk/news/rss.xml", "defaultCategory": "Trade" },
+    { "name": "Bank of England - News", "feedUrl": "https://www.bankofengland.co.uk/RSS/News", "defaultCategory": "Business" },
+    { "name": "PRA - Publications", "feedUrl": "https://www.bankofengland.co.uk/rss/prudential-regulation-publications", "defaultCategory": "Trade" },
+    { "name": "Bank Underground", "feedUrl": "https://bankunderground.co.uk/feed", "defaultCategory": "Business" },
+    { "name": "Bank Overground", "feedUrl": "https://www.bankofengland.co.uk/rss/bank-overground", "defaultCategory": "Business" },
+
+    { "name": "NCSC - All updates", "feedUrl": "https://www.ncsc.gov.uk/api/1/services/v1/all/rss-feed.xml", "defaultCategory": "Business" },
+    { "name": "The Register - Security", "feedUrl": "https://www.theregister.com/security/headlines.rss", "defaultCategory": "Business" },
+
+    { "name": "Insurance Fraud Bureau (IFB)", "feedUrl": "https://insurancefraudbureau.org/rss", "defaultCategory": "Motor" },
+    { "name": "Thatcham Research - All news", "feedUrl": "https://news.thatcham.org/section/all-news/feed/", "defaultCategory": "Motor" },
+
+    { "name": "Flood Re - News", "feedUrl": "https://floodre.co.uk/news/feed", "defaultCategory": "Home" },
+
+    { "name": "MoneySavingExpert - News", "feedUrl": "https://www.moneysavingexpert.com/news/feeds/news.rss", "defaultCategory": "Business" },
+    { "name": "Save the Student", "feedUrl": "https://savethestudent.org/feed", "defaultCategory": "Student" },
+
+    { "name": "Farmers Weekly - All articles", "feedUrl": "https://www.fwi.co.uk/rss-feed/56", "defaultCategory": "Rural" },
+
+    { "name": "BBC News - Business", "feedUrl": "https://feeds.bbci.co.uk/news/business/rss.xml", "defaultCategory": "Business" },
+    { "name": "BBC News - UK", "feedUrl": "https://feeds.bbci.co.uk/news/uk/rss.xml", "defaultCategory": "Business" },
+    { "name": "BBC News - Health", "feedUrl": "https://feeds.bbci.co.uk/news/health/rss.xml", "defaultCategory": "Life & Health" },
+    { "name": "BBC News - Family & Education", "feedUrl": "https://feeds.bbci.co.uk/news/education/rss.xml", "defaultCategory": "Student" },
+
+    { "name": "National Crime Agency - News", "feedUrl": "https://www.nationalcrimeagency.gov.uk/news?format=feed&type=rss", "defaultCategory": "Business" },
+
+    { "name": "Insurance Post - RSS directory", "siteUrl": "https://www.postonline.co.uk/rss-feeds", "defaultCategory": "Trade" },
+    { "name": "Insurance Day - RSS directory", "siteUrl": "https://www.insuranceday.com/rss-feeds", "defaultCategory": "Trade" },
+
+    { "name": "Thatcham Research (main site feed)", "feedUrl": "https://www.thatcham.org/feed/", "defaultCategory": "Motor" },
+    { "name": "Reinsurance (UK focus - Insurance Post section)", "siteUrl": "https://www.postonline.co.uk/reinsurance", "defaultCategory": "Trade" },
+
+    { "name": "MoneySavingExpert Forum - Travel Insurance (forum feed)", "siteUrl": "https://forums.moneysavingexpert.com/categories/travel-insurance", "defaultCategory": "Life & Health" },
+    { "name": "MoneySavingExpert Forum - Motoring (forum feed)", "siteUrl": "https://forums.moneysavingexpert.com/categories/motoring", "defaultCategory": "Motor" },
+
+    { "name": "BBC News - Technology", "feedUrl": "https://feeds.bbci.co.uk/news/technology/rss.xml", "defaultCategory": "Business" },
+    { "name": "BBC News - Science & Environment", "siteUrl": "https://www.bbc.com/news/science_and_environment", "defaultCategory": "Home" },
+    { "name": "Hiscox – Knowledge Centre (Business Blog)", "siteUrl": "https://www.hiscox.co.uk/business-blog", "sourceType": "scraped", "defaultCategory": "Business" },
+    { "name": "Confused.com – Home Guides", "siteUrl": "https://www.confused.com/home-insurance/guides", "sourceType": "scraped", "defaultCategory": "Home" },
+
+    { "name": "MoneySavingExpert - Insurance hub", "siteUrl": "https://www.moneysavingexpert.com/insurance/", "defaultCategory": "Home" }
+  ]
+}
