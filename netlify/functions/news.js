@@ -18,7 +18,11 @@ async function fetchText(url, timeoutMs = 9000) {
   try {
     const res = await fetch(url, {
       redirect: "follow",
-      signal: controller.signal
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "InsightsDashboardBot/1.0 (+Netlify Function)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      }
     });
 
     if (!res.ok) {
@@ -135,13 +139,13 @@ function classify(defaultCategory, title, summary) {
   if (has("motor", "car", "van", "driver", "fleet", "ev", "theft")) return "Motor";
   if (has("home", "property", "buildings", "contents", "flood", "subsidence")) return "Home";
   if (has("life insurance", "income protection", "health", "medical", "nhs")) return "Life & Health";
-  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba")) return "Trade";
+  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba", "hiscox")) return "Trade";
 
   return defaultCategory || "Business";
 }
 
 // --------------------
-// GENERIC SCRAPER ENGINE (NEW)
+// SCRAPER ENGINE
 // --------------------
 
 async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, match }) {
@@ -161,6 +165,8 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
       return;
     }
 
+    u.hash = "";
+
     if (hostname && u.hostname !== hostname) return;
     if (!match(u.pathname)) return;
 
@@ -168,7 +174,6 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
   });
 
   const urls = Array.from(articleUrls).slice(0, 25);
-
   const items = [];
 
   for (const url of urls) {
@@ -178,29 +183,33 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
 
       const title =
         $$("meta[property='og:title']").attr("content") ||
-        $$("title").text() ||
-        $$("h1").first().text();
+        $$("h1").first().text() ||
+        $$("title").text();
 
       const description =
         $$("meta[name='description']").attr("content") ||
         $$("meta[property='og:description']").attr("content") ||
+        $$("p").first().text() ||
         "";
 
-      let publishedAt =
+      const publishedAt =
         $$("meta[property='article:published_time']").attr("content") ||
         $$("time").first().attr("datetime") ||
+        $$("time").first().text() ||
         null;
 
-      items.push(
-        normaliseItem({
-          title,
-          url,
-          summary: description,
-          publishedAt,
-          source: sourceName,
-          category
-        })
-      );
+      const item = normaliseItem({
+        title,
+        url,
+        summary: description,
+        publishedAt,
+        source: sourceName,
+        category
+      });
+
+      if (item.title && item.url) {
+        items.push(item);
+      }
     } catch (err) {
       console.warn(`Scrape failed: ${url}`, err.message);
     }
@@ -214,38 +223,20 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
 // --------------------
 
 const SCRAPERS = {
-  "https://www.hiscox.co.uk/business-blog": {
-    hostname: "www.hiscox.co.uk",
-    sourceName: "Hiscox – Knowledge Centre (Business Blog)",
-    category: "Business",
+  "https://www.hiscoxgroup.com/news/press-releases": {
+    hostname: "www.hiscoxgroup.com",
+    sourceName: "Hiscox Group - Press Releases",
+    category: "Trade",
 
     match(pathname) {
-      const parts = pathname.split("/").filter(Boolean);
+      const cleanPath = pathname.replace(/\/$/, "");
+      const parts = cleanPath.split("/").filter(Boolean);
 
-      const slugs = new Set([
-        "brand-and-marketing",
-        "finance-and-legal",
-        "starting-up",
-        "customers-and-clients",
-        "small-business-stories",
-        "data-and-tech",
-        "growth-and-operations",
-        "wellbeing-and-workplace",
-        "authors"
-      ]);
-
-      return parts.length === 2 && parts[0] === "business-blog" && !slugs.has(parts[1]);
-    }
-  },
-
-  "https://www.confused.com/home-insurance/guides": {
-    hostname: "www.confused.com",
-    sourceName: "Confused.com – Home Guides",
-    category: "Home",
-
-    match(pathname) {
-      const parts = pathname.split("/").filter(Boolean);
-      return parts.length >= 3 && parts[0] === "home-insurance" && parts[1] === "guides";
+      return (
+        parts.length >= 3 &&
+        parts[0] === "news" &&
+        parts[1] === "press-releases"
+      );
     }
   }
 };
@@ -272,10 +263,6 @@ export const handler = async () => {
     const t0 = Date.now();
 
     try {
-      // --------------------
-      // SCRAPED SOURCES
-      // --------------------
-
       if (source.sourceType === "scraped" && source.siteUrl) {
         const scraper = SCRAPERS[source.siteUrl];
 
@@ -307,16 +294,11 @@ export const handler = async () => {
         continue;
       }
 
-      // --------------------
-      // RSS SOURCES
-      // --------------------
-
       if (source.feedUrl) {
         const xml = await fetchText(source.feedUrl, 9000);
         const feed = await parser.parseString(xml);
 
         const items = (feed.items || []).slice(0, 25);
-
         let kept = 0;
 
         for (const item of items) {
