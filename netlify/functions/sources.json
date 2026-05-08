@@ -40,9 +40,7 @@
 
     { "name": "BBC News - Technology", "feedUrl": "https://feeds.bbci.co.uk/news/technology/rss.xml", "defaultCategory": "Business" },
     { "name": "BBC News - Science & Environment", "siteUrl": "https://www.bbc.com/news/science_and_environment", "defaultCategory": "Home" },
-    { "name": "Hiscox – Knowledge Centre (Business Blog)", "siteUrl": "https://www.hiscox.co.uk/business-blog", "sourceType": "scraped", "defaultCategory": "Business" },
-    { "name": "Confused.com – Home Guides", "siteUrl": "https://www.confused.com/home-insurance/guides", "sourceType": "scraped", "defaultCategory": "Home" },
-
+    
     { "name": "MoneySavingExpert - Insurance hub", "siteUrl": "https://www.moneysavingexpert.com/insurance/", "defaultCategory": "Home" }
   ]
 }
