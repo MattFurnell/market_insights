@@ -1,5 +1,3 @@
-news.js
-
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 
