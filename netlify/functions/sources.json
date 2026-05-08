@@ -40,8 +40,7 @@
 
     { "name": "BBC News - Technology", "feedUrl": "https://feeds.bbci.co.uk/news/technology/rss.xml", "defaultCategory": "Business" },
     { "name": "BBC News - Science & Environment", "siteUrl": "https://www.bbc.com/news/science_and_environment", "defaultCategory": "Home" },
-    { "name": "Hiscox Group - Press Releases", "siteUrl": "https://www.hiscoxgroup.com/news/press-releases", "sourceType": "scraped", "defaultCategory": "Trade"
-}
+    { "name": "Hiscox Group - Press Releases", "siteUrl": "https://www.hiscoxgroup.com/news/press-releases", "sourceType": "scraped", "defaultCategory": "Trade" },
     { "name": "MoneySavingExpert - Insurance hub", "siteUrl": "https://www.moneysavingexpert.com/insurance/", "defaultCategory": "Home" }
   ]
 }
