@@ -1,9 +1,8 @@
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
-import { createRequire } from "module";
+import { readFileSync } from "fs";
 
-const require = createRequire(import.meta.url);
-const sourcesCfg = require("./sources.json");
+const sourcesCfg = JSON.parse(readFileSync(new URL("./sources.json", import.meta.url), "utf8"));
 
 const parser = new Parser({
   timeout: 12000,
