@@ -139,7 +139,7 @@ function classify(defaultCategory, title, summary) {
   if (has("motor", "car", "van", "driver", "fleet", "ev", "theft")) return "Motor";
   if (has("home", "property", "buildings", "contents", "flood", "subsidence")) return "Home";
   if (has("life insurance", "income protection", "health", "medical", "nhs")) return "Life & Health";
-  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba", "hiscox")) return "Trade";
+  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba", "hiscox", "axa", "nfu", "simply business")) return "Trade";
 
   return defaultCategory || "Business";
 }
@@ -148,7 +148,14 @@ function classify(defaultCategory, title, summary) {
 // SCRAPER ENGINE
 // --------------------
 
-async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, match }) {
+async function scrapeGenericArticles({
+  listUrl,
+  sourceName,
+  category,
+  hostname,
+  match,
+  extractDate
+}) {
   const html = await fetchText(listUrl, 9000);
   const $ = cheerio.load(html);
 
@@ -192,11 +199,16 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
         $$("p").first().text() ||
         "";
 
-      const publishedAt =
+      let publishedAt =
         $$("meta[property='article:published_time']").attr("content") ||
+        $$("meta[name='date']").attr("content") ||
         $$("time").first().attr("datetime") ||
         $$("time").first().text() ||
         null;
+
+      if (!publishedAt && typeof extractDate === "function") {
+        publishedAt = extractDate($$);
+      }
 
       const item = normaliseItem({
         title,
@@ -223,8 +235,6 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
 // --------------------
 
 const SCRAPERS = {
-
-  // HISCOX
   "https://www.hiscoxgroup.com/news/press-releases": {
     hostname: "www.hiscoxgroup.com",
     sourceName: "Hiscox Group - Press Releases",
@@ -235,29 +245,32 @@ const SCRAPERS = {
     }
   },
 
-  // SIMPLY BUSINESS
   "https://www.simplybusiness.co.uk/about-us/press-releases/": {
     hostname: "www.simplybusiness.co.uk",
     sourceName: "Simply Business - Press Releases",
     category: "Trade",
 
     match(pathname) {
-      return pathname.startsWith("/about-us/press-releases/");
+      return /^\/about-us\/press-releases\/[^/]+\/?$/.test(pathname);
     }
   },
 
-  // AXA (TIGHTENED)
   "https://www.axa.co.uk/newsroom/": {
     hostname: "www.axa.co.uk",
     sourceName: "AXA UK - Media Releases",
     category: "Trade",
 
     match(pathname) {
-      return pathname.startsWith("/newsroom/media-releases/");
+      return /^\/newsroom\/media-releases\/\d{4}\/[^/]+\/?$/.test(pathname);
+    },
+
+    extractDate($$) {
+      const bodyText = $$("body").text().replace(/\s+/g, " ").trim();
+      const match = bodyText.match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/);
+      return match ? match[0] : null;
     }
   },
 
-  // NFU MUTUAL (TIGHTENED + SAFETY FILTER)
   "https://www.nfumutual.co.uk/media-centre/": {
     hostname: "www.nfumutual.co.uk",
     sourceName: "NFU Mutual - Media Centre",
@@ -306,7 +319,8 @@ export const handler = async () => {
           sourceName: scraper.sourceName,
           category: scraper.category,
           hostname: scraper.hostname,
-          match: scraper.match
+          match: scraper.match,
+          extractDate: scraper.extractDate
         });
 
         for (const it of scraped) {
