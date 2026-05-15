@@ -1,7 +1,9 @@
-]import Parser from "rss-parser";
+import Parser from "rss-parser";
 import * as cheerio from "cheerio";
+import { createRequire } from "module";
 
-import sourcesCfg from "./sources.json" with { type: "json" };
+const require = createRequire(import.meta.url);
+const sourcesCfg = require("./sources.json");
 
 const parser = new Parser({
   timeout: 12000,
