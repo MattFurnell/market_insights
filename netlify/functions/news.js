@@ -199,15 +199,20 @@ async function scrapeGenericArticles({
         $$("p").first().text() ||
         "";
 
-      let publishedAt =
+      let publishedAt = null;
+
+      if (typeof extractDate === "function") {
+        publishedAt = extractDate($$);
+      }
+
+      if (!publishedAt) {
+      publishedAt =
         $$("meta[property='article:published_time']").attr("content") ||
         $$("meta[name='date']").attr("content") ||
         $$("time").first().attr("datetime") ||
         $$("time").first().text() ||
         null;
-
-      if (!publishedAt && typeof extractDate === "function") {
-        publishedAt = extractDate($$);
+      }
       }
 
       const item = normaliseItem({
@@ -245,17 +250,7 @@ const SCRAPERS = {
     }
   },
 
-  "https://www.simplybusiness.co.uk/about-us/press-releases/": {
-    hostname: "www.simplybusiness.co.uk",
-    sourceName: "Simply Business - Press Releases",
-    category: "Trade",
-
-    match(pathname) {
-      return /^\/about-us\/press-releases\/[^/]+\/?$/.test(pathname);
-    }
-  },
-
-  "https://www.axa.co.uk/newsroom/": {
+  "https://www.axa.co.uk/newsroom": {
     hostname: "www.axa.co.uk",
     sourceName: "AXA UK - Media Releases",
     category: "Trade",
@@ -265,13 +260,28 @@ const SCRAPERS = {
     },
 
     extractDate($$) {
-      const bodyText = $$("body").text().replace(/\s+/g, " ").trim();
-      const match = bodyText.match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/);
-      return match ? match[0] : null;
+      const h1 = $$("h1").first();
+      const textAfterTitle = h1.parent().text().replace(/\s+/g, " ").trim();
+
+      const dateMatch =
+        textAfterTitle.match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/) ||
+        $$("body").text().replace(/\s+/g, " ").trim().match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/);
+
+      return dateMatch ? dateMatch[0] : null;
     }
   },
 
-  "https://www.nfumutual.co.uk/media-centre/": {
+  "https://www.simplybusiness.co.uk/about-us/press-releases": {
+    hostname: "www.simplybusiness.co.uk",
+    sourceName: "Simply Business - Press Releases",
+    category: "Trade",
+
+    match(pathname) {
+      return /^\/about-us\/press-releases\/[^/]+\/?$/.test(pathname);
+    }
+  },
+
+  "https://www.nfumutual.co.uk/media-centre": {
     hostname: "www.nfumutual.co.uk",
     sourceName: "NFU Mutual - Media Centre",
     category: "Trade",
@@ -284,7 +294,6 @@ const SCRAPERS = {
     }
   }
 };
-
 // --------------------
 // MAIN HANDLER
 // --------------------
@@ -308,7 +317,8 @@ export const handler = async () => {
 
     try {
       if (source.sourceType === "scraped" && source.siteUrl) {
-        const scraper = SCRAPERS[source.siteUrl];
+        const sourceKey = source.siteURL.replace(/\/$/, "");
+        const scraper = SCRAPERS[sourceKey];
 
         if (!scraper) {
           throw new Error(`No scraper configured for ${source.siteUrl}`);
