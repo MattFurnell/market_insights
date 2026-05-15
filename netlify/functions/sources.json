@@ -43,9 +43,6 @@
 
     { "name": "MoneySavingExpert - Insurance hub", "siteUrl": "https://www.moneysavingexpert.com/insurance/", "defaultCategory": "Home" },
 
-    { "name": "Hiscox Group - Press Releases", "siteUrl": "https://www.hiscoxgroup.com/news/press-releases", "sourceType": "scraped", "defaultCategory": "Trade" },
-    { "name": "AXA UK - Media Releases", "siteUrl": "https://www.axa.co.uk/newsroom/", "sourceType": "scraped", "defaultCategory": "Trade" },
-    { "name": "Simply Business - Press Releases", "siteUrl": "https://www.simplybusiness.co.uk/about-us/press-releases/", "sourceType": "scraped", "defaultCategory": "Trade" },
-    { "name": "NFU Mutual - Media Centre", "siteUrl": "https://www.nfumutual.co.uk/media-centre/", "sourceType": "scraped", "defaultCategory": "Trade" }
+    { "name": "Hiscox Group - Press Releases", "siteUrl": "https://www.hiscoxgroup.com/news/press-releases", "sourceType": "scraped", "defaultCategory": "Trade" }
   ]
 }
