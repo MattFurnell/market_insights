@@ -1,7 +1,7 @@
 ]import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 
-import sourcesCfg from "./sources.json" assert { type: "json" };
+import sourcesCfg from "./sources.json" with { type: "json" };
 
 const parser = new Parser({
   timeout: 12000,
