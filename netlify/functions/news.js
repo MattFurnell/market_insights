@@ -213,7 +213,6 @@ async function scrapeGenericArticles({
         $$("time").first().text() ||
         null;
       }
-      }
 
       const item = normaliseItem({
         title,
