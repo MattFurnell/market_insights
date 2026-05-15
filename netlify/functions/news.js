@@ -223,19 +223,50 @@ async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, 
 // --------------------
 
 const SCRAPERS = {
+
+  // HISCOX
   "https://www.hiscoxgroup.com/news/press-releases": {
     hostname: "www.hiscoxgroup.com",
     sourceName: "Hiscox Group - Press Releases",
     category: "Trade",
 
     match(pathname) {
-      const cleanPath = pathname.replace(/\/$/, "");
-      const parts = cleanPath.split("/").filter(Boolean);
+      return pathname.startsWith("/news/press-releases/");
+    }
+  },
 
+  // SIMPLY BUSINESS
+  "https://www.simplybusiness.co.uk/about-us/press-releases/": {
+    hostname: "www.simplybusiness.co.uk",
+    sourceName: "Simply Business - Press Releases",
+    category: "Trade",
+
+    match(pathname) {
+      return pathname.startsWith("/about-us/press-releases/");
+    }
+  },
+
+  // AXA (TIGHTENED)
+  "https://www.axa.co.uk/newsroom/": {
+    hostname: "www.axa.co.uk",
+    sourceName: "AXA UK - Media Releases",
+    category: "Trade",
+
+    match(pathname) {
+      return pathname.startsWith("/newsroom/media-releases/");
+    }
+  },
+
+  // NFU MUTUAL (TIGHTENED + SAFETY FILTER)
+  "https://www.nfumutual.co.uk/media-centre/": {
+    hostname: "www.nfumutual.co.uk",
+    sourceName: "NFU Mutual - Media Centre",
+    category: "Trade",
+
+    match(pathname) {
       return (
-        parts.length >= 3 &&
-        parts[0] === "news" &&
-        parts[1] === "press-releases"
+        pathname.startsWith("/media-centre/") &&
+        pathname.split("/").filter(Boolean).length > 1
       );
     }
   }
