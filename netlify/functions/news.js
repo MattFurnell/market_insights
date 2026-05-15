@@ -139,7 +139,7 @@ function classify(defaultCategory, title, summary) {
   if (has("motor", "car", "van", "driver", "fleet", "ev", "theft")) return "Motor";
   if (has("home", "property", "buildings", "contents", "flood", "subsidence")) return "Home";
   if (has("life insurance", "income protection", "health", "medical", "nhs")) return "Life & Health";
-  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba", "hiscox", "axa", "nfu", "simply business")) return "Trade";
+  if (has("broker", "underwriting", "lloyd", "reinsurance", "claims", "fca", "pra", "abi", "biba", "hiscox")) return "Trade";
 
   return defaultCategory || "Business";
 }
@@ -148,14 +148,7 @@ function classify(defaultCategory, title, summary) {
 // SCRAPER ENGINE
 // --------------------
 
-async function scrapeGenericArticles({
-  listUrl,
-  sourceName,
-  category,
-  hostname,
-  match,
-  extractDate
-}) {
+async function scrapeGenericArticles({ listUrl, sourceName, category, hostname, match }) {
   const html = await fetchText(listUrl, 9000);
   const $ = cheerio.load(html);
 
@@ -199,20 +192,11 @@ async function scrapeGenericArticles({
         $$("p").first().text() ||
         "";
 
-      let publishedAt = null;
-
-      if (typeof extractDate === "function") {
-        publishedAt = extractDate($$);
-      }
-
-      if (!publishedAt) {
-      publishedAt =
+      const publishedAt =
         $$("meta[property='article:published_time']").attr("content") ||
-        $$("meta[name='date']").attr("content") ||
         $$("time").first().attr("datetime") ||
         $$("time").first().text() ||
         null;
-      }
 
       const item = normaliseItem({
         title,
@@ -245,54 +229,18 @@ const SCRAPERS = {
     category: "Trade",
 
     match(pathname) {
-      return pathname.startsWith("/news/press-releases/");
-    }
-  },
+      const cleanPath = pathname.replace(/\/$/, "");
+      const parts = cleanPath.split("/").filter(Boolean);
 
-  "https://www.axa.co.uk/newsroom": {
-    hostname: "www.axa.co.uk",
-    sourceName: "AXA UK - Media Releases",
-    category: "Trade",
-
-    match(pathname) {
-      return /^\/newsroom\/media-releases\/\d{4}\/[^/]+\/?$/.test(pathname);
-    },
-
-    extractDate($$) {
-      const h1 = $$("h1").first();
-      const textAfterTitle = h1.parent().text().replace(/\s+/g, " ").trim();
-
-      const dateMatch =
-        textAfterTitle.match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/) ||
-        $$("body").text().replace(/\s+/g, " ").trim().match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/);
-
-      return dateMatch ? dateMatch[0] : null;
-    }
-  },
-
-  "https://www.simplybusiness.co.uk/about-us/press-releases": {
-    hostname: "www.simplybusiness.co.uk",
-    sourceName: "Simply Business - Press Releases",
-    category: "Trade",
-
-    match(pathname) {
-      return /^\/about-us\/press-releases\/[^/]+\/?$/.test(pathname);
-    }
-  },
-
-  "https://www.nfumutual.co.uk/media-centre": {
-    hostname: "www.nfumutual.co.uk",
-    sourceName: "NFU Mutual - Media Centre",
-    category: "Trade",
-
-    match(pathname) {
       return (
-        pathname.startsWith("/media-centre/") &&
-        pathname.split("/").filter(Boolean).length > 1
+        parts.length >= 3 &&
+        parts[0] === "news" &&
+        parts[1] === "press-releases"
       );
     }
   }
 };
+
 // --------------------
 // MAIN HANDLER
 // --------------------
@@ -316,8 +264,7 @@ export const handler = async () => {
 
     try {
       if (source.sourceType === "scraped" && source.siteUrl) {
-        const sourceKey = source.siteURL.replace(/\/$/, "");
-        const scraper = SCRAPERS[sourceKey];
+        const scraper = SCRAPERS[source.siteUrl];
 
         if (!scraper) {
           throw new Error(`No scraper configured for ${source.siteUrl}`);
@@ -328,8 +275,7 @@ export const handler = async () => {
           sourceName: scraper.sourceName,
           category: scraper.category,
           hostname: scraper.hostname,
-          match: scraper.match,
-          extractDate: scraper.extractDate
+          match: scraper.match
         });
 
         for (const it of scraped) {
