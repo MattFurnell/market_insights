@@ -1,4 +1,4 @@
-import Parser from "rss-parser";
+]import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 
 import sourcesCfg from "./sources.json" assert { type: "json" };
@@ -235,6 +235,26 @@ const SCRAPERS = {
       return (
         parts.length >= 3 &&
         parts[0] === "news" &&
+        parts[1] === "press-releases"
+      );
+    }
+  },
+
+  "https://www.simplybusiness.co.uk/about-us/press-releases/": {
+    hostname: "www.simplybusiness.co.uk",
+    sourceName: "Simply Business - Press Releases",
+    category: "Trade",
+
+    // Matches individual press release articles, e.g.:
+    //   /about-us/press-releases/2024/01/some-article-slug/
+    // Excludes the listing page itself (/about-us/press-releases/ alone).
+    match(pathname) {
+      const cleanPath = pathname.replace(/\/$/, "");
+      const parts = cleanPath.split("/").filter(Boolean);
+
+      return (
+        parts.length >= 3 &&
+        parts[0] === "about-us" &&
         parts[1] === "press-releases"
       );
     }
